@@ -50,7 +50,7 @@ In .NET Core applications, you can use project scripts to automatically. A commo
 ```JS
 {
   "scripts": {
-    "postbuild": "dotnet webcompile"
+    "postcompile": ["dotnet webcompile"]
   }
 }
 ```
