@@ -33,14 +33,14 @@ Each configuration file is a json file that contains an array of work item defin
 ```JS
 [
   {
-    "inputFiles": [ "wwwroot/site.scss" ], /* The input file to be compiled, you can use multiple files as input, and they will be combined before compilation. You may also use globbing pattern in input files, e.g. use 'wwwroot/**/*.scss' to get all SCSS files in wwwroot and its sub directory. */
-    "outputFileName": "wwwroot/site.css", /* The path of the final output file. */
-    "type": "SCSS", /* The compiler type, currently only SCSS and SASS are supported. You can omit this settings, and this tool will try to infer the comipler accroding to the first input file's name. */
-    "options": { /*Addtional options, currently as the same as ScssOptions class in SharpScss package.*
+    "inputFiles": [ "wwwroot/site.scss" ], // The input file to be compiled, you can use multiple files as input, and they will be combined before compilation. You may also use globbing pattern in input files, e.g. use "wwwroot/**/*.scss" to get all SCSS files in wwwroot and its sub directory. 
+    "outputFileName": "wwwroot/site.css", // The path of the final output file.
+    "type": "SCSS", //The compiler type, currently only SCSS and SASS are supported. You can omit this settings, and this tool will try to infer the comipler accroding to the first input file's name.
+    "options": { //Addtional options, currently as the same as ScssOptions class in SharpScss package.
     }
   },
   {
-    /* Another work items. One file can contains arbitray numbers of work items, and each will be handled invididually. */
+    // Another work items. One file can contains arbitray numbers of work items, and each will be handled invididually.
   }
 ]
 ```
