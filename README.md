@@ -3,8 +3,10 @@
 
 ## Release Note
 
+I'll update this part when new release is published.
+
 - 0.1.0: Basic SCSS compilation support.
-- 
+
 ## Usage
 
 ### Add Tools Package
@@ -31,9 +33,9 @@ Each configuration file is a json file that contains an array of work item defin
 ```JS
 [
   {
-    "inputFiles": [ "wwwroot/site.scss" ] /* The input file to be compiled, you can use multiple files as input, and they will be combined before compilation. You may also use globbing pattern in input files, e.g. use "wwwroot/**/*.scss" to get all SCSS files in wwwroot and its sub directory. */
-    "outputFileName": "wwwroot/site.css" /* The final output file's path. */
-    "type": "SCSS" /* The compiler type, currently only SCSS and SASS are supported. You can omit this settings, and this tool will try to infer the comipler accroding to the first input file's name. */
+    "inputFiles": [ "wwwroot/site.scss" ], /* The input file to be compiled, you can use multiple files as input, and they will be combined before compilation. You may also use globbing pattern in input files, e.g. use "wwwroot/**/*.scss" to get all SCSS files in wwwroot and its sub directory. */
+    "outputFileName": "wwwroot/site.css", /* The final output file's path. */
+    "type": "SCSS", /* The compiler type, currently only SCSS and SASS are supported. You can omit this settings, and this tool will try to infer the comipler accroding to the first input file's name. */
     "options": { /*Addtional options, currently as the same as ScssOptions class in SharpScss package.*
     }
   },
@@ -45,7 +47,7 @@ Each configuration file is a json file that contains an array of work item defin
 
 ### Binding with Building Events
 In .NET Core applications, you can use project scripts to automatically. A common usage for this tool is compiling files after you build your project, to do so, you may edit `project.json` file and add a new line in `scripts` section like:
-```JSON
+```JS
 {
   "scripts": {
     "postbuild": "dotnet webcompile"
