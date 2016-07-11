@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9F7939AC-9E5A-416C-89C4-EA606D1AE671}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65DFE68F-1D12-47A1-9891-95BE19ACC47C}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Sakura.AspNetCore.Tools.WebCompiler", "src\Sakura.AspNetCore.Tools.WebCompiler\Sakura.AspNetCore.Tools.WebCompiler.xproj", "{DA666CCB-BFF4-4177-B766-FD512FF5B096}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA666CCB-BFF4-4177-B766-FD512FF5B096}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA666CCB-BFF4-4177-B766-FD512FF5B096}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA666CCB-BFF4-4177-B766-FD512FF5B096}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA666CCB-BFF4-4177-B766-FD512FF5B096}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DA666CCB-BFF4-4177-B766-FD512FF5B096} = {9F7939AC-9E5A-416C-89C4-EA606D1AE671}
+	EndGlobalSection
+EndGlobal
