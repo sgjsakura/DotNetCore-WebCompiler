@@ -1,7 +1,8 @@
 # DotNetCore-WebCompiler
-.NET Core tools used to compile client web files (e.g. SCSS, TS, etc) from .NET Core projects. This tool uses the (SharpScss)[https://www.nuget.org/packages/SharpScss/] as its internal implementation and wrappered it to be executable in .NET Shared Framework hosting service.
+.NET Core tools used to compile client web files (e.g. SCSS, TS, etc) from .NET Core projects. This tool uses the [SharpScss](https://www.nuget.org/packages/SharpScss/) as its internal implementation and wrappered it to be executable in .NET Shared Framework hosting service.
 
 ## Release Note
+
 - 0.1.0: Basic SCSS compilation support.
 - 
 ## Usage
@@ -27,7 +28,7 @@ If no argument is set, this tool will use `--build` as its default work mode.
 
 ### Configuration File Format
 Each configuration file is a json file that contains an array of work item definitions. A sample for this file is like following:
-```JSON
+```JS
 [
   {
     "inputFiles": [ "wwwroot/site.scss" ] /* The input file to be compiled, you can use multiple files as input, and they will be combined before compilation. You may also use globbing pattern in input files, e.g. use "wwwroot/**/*.scss" to get all SCSS files in wwwroot and its sub directory. */
@@ -47,7 +48,7 @@ In .NET Core applications, you can use project scripts to automatically. A commo
 ```JSON
 {
   "scripts": {
-    postbuild: "dotnet webcompile"
+    "postbuild": "dotnet webcompile"
   }
 }
 ```
