@@ -260,8 +260,8 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 			var ext = Path.GetExtension(fileName);
 			switch (ext.ToLowerInvariant())
 			{
-				case "scss":
-				case "sass":
+				case ".scss":
+				case ".sass":
 					return WebCompilerType.Scss;
 			}
 
