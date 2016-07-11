@@ -44,6 +44,7 @@ Each configuration file is a json file that contains an array of work item defin
   }
 ]
 ```
+You can put arbitray count of config files, however, for most common usage, you just need put a `compileconfig.json` file in you project root directory and define one work item for each source file.
 
 ### Binding with Building Events
 In .NET Core applications, you can use project scripts to automatically. A common usage for this tool is compiling files after you build your project, to do so, you may edit `project.json` file and add a new line in `scripts` section like:
