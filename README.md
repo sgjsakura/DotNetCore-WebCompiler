@@ -5,6 +5,7 @@
 
 I'll update this part when new release is published.
 
+- 0.2.0: SCSS source map support.
 - 0.1.0: Basic SCSS compilation support.
 
 ## Usage
@@ -15,7 +16,7 @@ In order to use this tools, first use need to add this tool as a tool package in
 ### Command-Line Usage
 The most common way to use this tool is running it from .NET Shared Framework Hosting Service. You may use the following command line to run this tool:
 ```CMD
-dotnet webcompile [args] [configFiles]
+dotnet web-compile [args] [configFiles]
 ```
 The `configFiles` are paths of one or more configuration files used to specify all input files, output file and options for web compilation. If no configuration files are specified, this tools will try to use a file named `compileconfig.json` in the current working directory as the configuration file. The detailed format for configuration files will be shown in the next section.  
 
@@ -35,9 +36,10 @@ Each configuration file is a json file that contains an array of work item defin
 [
   {
     "inputFiles": [ "wwwroot/site.scss" ], // The input file to be compiled, you can use multiple files as input, and they will be combined before compilation. You may also use globbing pattern in input files, e.g. use "wwwroot/**/*.scss" to get all SCSS files in wwwroot and its sub directory. 
-    "outputFileName": "wwwroot/site.css", // The path of the final output file.
+    "outputFile": "wwwroot/site.css", // If you provide this setting, all output will be merged and write to that file. If you ignore this setting, the compiler will genreate one output file per input file using an automatically naming manner.
     "type": "SCSS", //The compiler type, currently only SCSS and SASS are supported. You can omit this settings, and this tool will try to infer the comipler accroding to the first input file's name.
-    "options": { //Addtional options, currently as the same as ScssOptions class in SharpScss package.
+    "options": { 
+      //Addtional options, please see the next section for details.
     }
   },
   {
@@ -47,12 +49,23 @@ Each configuration file is a json file that contains an array of work item defin
 ```
 You can put arbitray count of config files, however, for most common usage, you just need put a `compileconfig.json` file in you project root directory and define one work item for each source file.
 
+#### Options
+
+Different file type uses different comppilers, and they support different options. This section describes options currently supported by each compiler. The setting names are always case insensetive.
+
+##### For SCSS/SASS Compiler
+
+Settings|Value Type|Description
+--------|----------|-----------
+`generateSourceMap`|bool|If true, the SCSS compiler will generate a source map file. Note that if you specified more than one file as input files, the source map will be unavailable and not generated.
+`outputDirectory`|string|If set, the output files for each input will be placed in the directory specified. This settings is ignored if you specified the "outputFile" setting
+
 ### Binding with Building Events
 In .NET Core applications, you can use project scripts to automatically. A common usage for this tool is compiling files after you build your project, to do so, you may edit `project.json` file and add a new line in `scripts` section like:
 ```JS
 {
   "scripts": {
-    "postcompile": ["dotnet webcompile"]
+    "postcompile": ["dotnet web-compile"]
   }
 }
 ```
