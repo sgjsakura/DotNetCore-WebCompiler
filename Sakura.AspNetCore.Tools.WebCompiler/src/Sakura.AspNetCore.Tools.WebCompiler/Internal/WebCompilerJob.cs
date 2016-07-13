@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Sakura.AspNetCore.Tools.WebCompiler.Internal
+﻿namespace Sakura.AspNetCore.Tools.WebCompiler.Internal
 {
 	/// <summary>
 	/// Define as a work compiler job.

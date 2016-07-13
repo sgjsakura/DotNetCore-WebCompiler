@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Sakura.AspNetCore.Tools.WebCompiler
+﻿namespace Sakura.AspNetCore.Tools.WebCompiler
 {
 	/// <summary>
 	/// Define as a common result for web compiler.

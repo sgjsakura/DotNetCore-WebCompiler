@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Newtonsoft.Json;
 using static Sakura.AspNetCore.Tools.WebCompiler.MessageHelper;
 
 namespace Sakura.AspNetCore.Tools.WebCompiler

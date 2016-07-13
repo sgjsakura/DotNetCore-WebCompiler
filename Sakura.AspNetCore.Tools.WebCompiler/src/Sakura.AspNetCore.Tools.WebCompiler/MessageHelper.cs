@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using JetBrains.Annotations;
-using Microsoft.DotNet.Cli.Utils;
+using Microsoft.Extensions.Cli.Utils;
 
 namespace Sakura.AspNetCore.Tools.WebCompiler
 {

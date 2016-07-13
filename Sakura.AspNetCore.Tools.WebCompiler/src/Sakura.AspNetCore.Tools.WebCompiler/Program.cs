@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.DotNet.Cli.Utils;
+using Microsoft.Extensions.Cli.Utils;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using Newtonsoft.Json;
 using Sakura.AspNetCore.Tools.WebCompiler.Internal;
 using Sakura.AspNetCore.Tools.WebCompiler.Scss;
-using SharpScss;
 using static Sakura.AspNetCore.Tools.WebCompiler.MessageHelper;
 
 namespace Sakura.AspNetCore.Tools.WebCompiler
