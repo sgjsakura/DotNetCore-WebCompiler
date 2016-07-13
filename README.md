@@ -20,6 +20,7 @@ dotnet webcompile [args] [configFiles]
 The `configFiles` are paths of one or more configuration files used to specify all input files, output file and options for web compilation. If no configuration files are specified, this tools will try to use a file named `compileconfig.json` in the current working directory as the configuration file. The detailed format for configuration files will be shown in the next section.  
 
 The `args` are extra arguments used to control the work mode of this tools. Currently the following args are supported:
+
 Value|Description
 -----|-----------
 `-?` or `-h` or `--help`|Show the command line help inforamtion
