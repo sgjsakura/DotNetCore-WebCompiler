@@ -318,7 +318,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 
 				return result;
 			}
-			catch (JsonSerializationException ex)
+			catch (JsonSerializationException)
 			{
 				WriteError($"The data defined in '{configFilePath}' is in an invalid format. Please see documentation for help.");
 			}

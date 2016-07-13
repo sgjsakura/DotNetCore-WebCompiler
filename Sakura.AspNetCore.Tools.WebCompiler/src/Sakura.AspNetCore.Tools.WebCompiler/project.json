@@ -1,7 +1,6 @@
 ﻿{
 	"version": "0.2.1",
 	"title": ".NET Core Web Compiler Tool",
-	"projectUrl": "https://github.com/sgjsakura/DotNetCore-WebCompiler",
 
 	"buildOptions": {
 		"emitEntryPoint": true,
@@ -16,6 +15,7 @@
 		"owners": [ "Iris Sakura" ],
 		"summary": "This tools is used to compile client web files in your .NET Core application.",
 		"releaseNotes": "Fix some bugs",
+		"projectUrl": "https://github.com/sgjsakura/DotNetCore-WebCompiler",
 		"repository": {
 
 			"type": "git",
