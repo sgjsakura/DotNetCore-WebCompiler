@@ -1,6 +1,8 @@
 # .NET Core Web Compiler Tool Guide
 .NET Core tools used to compile client web files (e.g. SCSS, TS, etc) from .NET Core projects. This tool uses the [SharpScss](https://www.nuget.org/packages/SharpScss/) as its internal implementation and wraps it to be executable in .NET Shared Framework hosting service.
 
+**Note: Currently, the internal package `SharpScss` uses P/Invoke for libsass.dll as its implementation. Under such circumstance, only Windows platform is supported to invoke the library correctly.**
+
 ## Release Note
 
 I'll update this part when new release is published.
