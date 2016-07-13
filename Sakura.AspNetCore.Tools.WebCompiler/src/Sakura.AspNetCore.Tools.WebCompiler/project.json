@@ -1,5 +1,8 @@
 ﻿{
 	"version": "0.2.1",
+	"title": ".NET Core Web Compiler Tool",
+	"projectUrl": "https://github.com/sgjsakura/DotNetCore-WebCompiler",
+
 	"buildOptions": {
 		"emitEntryPoint": true,
 		"outputName": "dotnet-web-compile"
