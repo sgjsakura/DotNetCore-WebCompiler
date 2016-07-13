@@ -1,5 +1,5 @@
 ﻿{
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"buildOptions": {
 		"emitEntryPoint": true,
 		"outputName": "dotnet-web-compile"
@@ -12,7 +12,7 @@
 	"packOptions": {
 		"owners": [ "Iris Sakura" ],
 		"summary": "This tools is used to compile client web files in your .NET Core application.",
-		"releaseNotes": "Update code strucutre.",
+		"releaseNotes": "Fix some bugs",
 		"repository": {
 
 			"type": "git",

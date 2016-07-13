@@ -254,6 +254,6 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		/// </summary>
 		/// <param name="workItem">The work item.</param>
 		/// <returns>A collection contains all output in the work item.</returns>
-		IEnumerable<string> IWebCompiler.GetDefaultOutputFile(WebCompilerWorkItem workItem) => GetDefaultOutputFile((WebCompilerWorkItem<TOptions>)workItem);
+		IEnumerable<string> IWebCompiler.GetDefaultOutputFile(WebCompilerWorkItem workItem) => GetDefaultOutputFile(ConvertWorkItem(workItem));
 	}
 }

@@ -29,7 +29,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler.Internal
 		/// <summary>
 		/// Get or set a path to generate the final merged output file. If this property is null, each file will be compiled seperately.
 		/// </summary>
-		public string MergedOutputFile { get; set; }
+		public string OutputFile { get; set; }
 
 		/// <summary>
 		/// Get or set the compiler type. The default of this property is <see cref="WebCompilerType.Auto"/>.

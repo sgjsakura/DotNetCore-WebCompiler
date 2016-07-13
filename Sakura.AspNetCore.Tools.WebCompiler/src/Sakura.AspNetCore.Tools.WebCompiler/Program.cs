@@ -243,7 +243,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 			return new WebCompilerWorkItem
 			{
 				InputFiles = new ReadOnlyCollection<string>(files),
-				OutputFile = defination.MergedOutputFile,
+				OutputFile = defination.OutputFile,
 				Type = defination.Type,
 				Options = new WebCompilerWorkItemOptions(new Dictionary<string, object>(defination.Options))
 			};
@@ -318,6 +318,10 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 
 				return result;
 			}
+			catch (JsonSerializationException ex)
+			{
+				WriteError($"The data defined in '{configFilePath}' is in an invalid format. Please see documentation for help.");
+			}
 			catch (IOException ex)
 			{
 				WriteError($"Cannot read the configuration file '{configFilePath}', detailed information: {ex.Message}");
@@ -378,7 +382,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 				try
 				{
 					File.Delete(file);
-					WriteSuccess("  -> Clean {0}", file);
+					WriteSuccess("Clean -> {0}", file);
 				}
 				catch (IOException ex)
 				{
