@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// ReSharper disable once CheckNamespace
 
-// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.Cli.Utils
 {
 	/// <summary>
-	/// Provide ANSI console extensions.
+	///     Provide ANSI console extensions.
 	/// </summary>
 	internal static class AnsiColorExtensions
 	{
@@ -20,6 +16,7 @@ namespace Microsoft.Extensions.Cli.Utils
 		{
 			return "\x1B[31m" + text + "\x1B[39m";
 		}
+
 		public static string Green(this string text)
 		{
 			return "\x1B[32m" + text + "\x1B[39m";
@@ -55,5 +52,4 @@ namespace Microsoft.Extensions.Cli.Utils
 			return "\x1B[1m" + text + "\x1B[22m";
 		}
 	}
-
 }

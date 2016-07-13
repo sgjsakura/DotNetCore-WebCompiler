@@ -4,20 +4,22 @@
 using Microsoft.Extensions.CommandLineUtils;
 
 // ReSharper disable once CheckNamespace
+
 namespace Microsoft.Extensions.Cli.Utils
 {
 	// Stupid-simple console manager
 	public class Reporter
 	{
-		private static readonly Reporter NullReporter = new Reporter(console: null);
-		private static object Lock { get; } = new object();
-
-		private AnsiConsole Console { get; }
+		private static readonly Reporter NullReporter = new Reporter(null);
 
 		private Reporter(AnsiConsole console)
 		{
 			Console = console;
 		}
+
+		private static object Lock { get; } = new object();
+
+		private AnsiConsole Console { get; }
 
 		public static Reporter Output { get; } = new Reporter(AnsiConsole.GetOutput(true));
 		public static Reporter Error { get; } = new Reporter(AnsiConsole.GetError(true));

@@ -4,17 +4,22 @@ using SharpScss;
 namespace Sakura.AspNetCore.Tools.WebCompiler.Scss
 {
 	/// <summary>
-	/// Provide SCSS/SASS compilation feature.
+	///     Provide SCSS/SASS compilation feature.
 	/// </summary>
 	public class ScssCompiler : WebCompilerBase<ScssOptions>
 	{
 		/// <summary>
-		/// Get the default output file extension.
+		///     Get the default output file extension.
 		/// </summary>
 		public override string DefaultOutputExtension => ".css";
 
 		/// <summary>
-		/// Compile a series of input files and generate the final result.
+		///     Get the compiler's type.
+		/// </summary>
+		public override WebCompilerType Type => WebCompilerType.Scss;
+
+		/// <summary>
+		///     Compile a series of input files and generate the final result.
 		/// </summary>
 		/// <param name="inputFiles">The collectino of all input files.</param>
 		/// <param name="outputFile">The user specified output file (if any).</param>
@@ -31,14 +36,18 @@ namespace Sakura.AspNetCore.Tools.WebCompiler.Scss
 		}
 
 		/// <summary>
-		/// The core method used to generate compiler result.
+		///     The core method used to generate compiler result.
 		/// </summary>
 		/// <param name="content">The content to be compiled.</param>
-		/// <param name="inputFileName">The input file path. If the <paramref name="content"/> is merged from a series of files, this parameter will be <c>null</c>.</param>
+		/// <param name="inputFileName">
+		///     The input file path. If the <paramref name="content" /> is merged from a series of files,
+		///     this parameter will be <c>null</c>.
+		/// </param>
 		/// <param name="outputFileName">The user specified output file path.</param>
 		/// <param name="options">The options.</param>
 		/// <returns>The compiler result.</returns>
-		protected override WebCompilerResult CompileContent(string content, string inputFileName, string outputFileName, ScssOptions options)
+		protected override WebCompilerResult CompileContent(string content, string inputFileName, string outputFileName,
+			ScssOptions options)
 		{
 			var scssOptions = new SharpScss.ScssOptions
 			{
@@ -65,7 +74,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler.Scss
 		}
 
 		/// <summary>
-		/// Convert a base options to a strong typed options.
+		///     Convert a base options to a strong typed options.
 		/// </summary>
 		/// <param name="options">The base options.</param>
 		/// <returns>The strong typed options.</returns>
@@ -73,12 +82,5 @@ namespace Sakura.AspNetCore.Tools.WebCompiler.Scss
 		{
 			return new ScssOptions(options.Settings);
 		}
-
-		/// <summary>
-		/// Get the compiler's type.
-		/// </summary>
-		public override WebCompilerType Type => WebCompilerType.Scss;
-
-
 	}
 }

@@ -1,8 +1,8 @@
 {
-  "profiles": {
-    "Sakura.AspNetCore.Tools.WebCompiler": {
-      "commandName": "Project",
-      "workingDirectory": "d:\\"
-    }
-  }
+	"profiles": {
+		"Sakura.AspNetCore.Tools.WebCompiler": {
+			"commandName": "Project",
+			"workingDirectory": "d:\\"
+		}
+	}
 }

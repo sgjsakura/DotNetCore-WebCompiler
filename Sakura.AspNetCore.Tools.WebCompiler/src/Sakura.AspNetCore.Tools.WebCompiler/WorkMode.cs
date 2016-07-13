@@ -1,20 +1,22 @@
 ﻿namespace Sakura.AspNetCore.Tools.WebCompiler
 {
 	/// <summary>
-	/// Define the work mode for web compiler.
+	///     Define the work mode for web compiler.
 	/// </summary>
 	public enum WorkMode
-	{ 
+	{
 		/// <summary>
-		/// Not specified.
+		///     Not specified.
 		/// </summary>
 		None = 0,
+
 		/// <summary>
-		/// Clean outputs. 
+		///     Clean outputs.
 		/// </summary>
 		Clean,
+
 		/// <summary>
-		/// Build outputs.
+		///     Build outputs.
 		/// </summary>
 		Build
 	}

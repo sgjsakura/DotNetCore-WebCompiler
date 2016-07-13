@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Cli.Utils;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.FileSystemGlobbing;
@@ -16,19 +17,21 @@ using static Sakura.AspNetCore.Tools.WebCompiler.MessageHelper;
 namespace Sakura.AspNetCore.Tools.WebCompiler
 {
 	/// <summary>
-	/// The main type of the application.
+	///     The main type of the application.
 	/// </summary>
+	[UsedImplicitly]
 	public static class Program
 	{
 		/// <summary>
-		/// Get the default name of config file. This field is constant.
+		///     Get the default name of config file. This field is constant.
 		/// </summary>
 		public const string DefaultConfigFileName = "compileconfig.json";
 
 		/// <summary>
-		/// The entrypoint fo the application.
+		///     The entrypoint fo the application.
 		/// </summary>
 		/// <param name="args">Application arguments.</param>
+		[UsedImplicitly]
 		public static void Main(string[] args)
 		{
 			var app = new CommandLineApplication
@@ -97,7 +100,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		#region Core Method
 
 		/// <summary>
-		/// Create all jobs from config files.
+		///     Create all jobs from config files.
 		/// </summary>
 		/// <param name="configFiles">Config files.</param>
 		private static IEnumerable<WebCompilerJob> CreateJobsFromFiles(IEnumerable<string> configFiles)
@@ -108,7 +111,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Run all jobs.
+		///     Run all jobs.
 		/// </summary>
 		/// <param name="configFiles">Job source config files.</param>
 		/// <param name="mode">Tool's work mode.</param>
@@ -134,10 +137,10 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Create all jobs for work items.
+		///     Create all jobs for work items.
 		/// </summary>
 		/// <param name="workItems">A collection of all work items.</param>
-		/// <returns>All job generated from <paramref name="workItems"/>.</returns>
+		/// <returns>All job generated from <paramref name="workItems" />.</returns>
 		private static IEnumerable<WebCompilerJob> CreateAllJobs(IEnumerable<WebCompilerWorkItem> workItems)
 		{
 			foreach (var item in workItems)
@@ -152,7 +155,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Create a job from a <see cref="WebCompilerWorkItem"/>.
+		///     Create a job from a <see cref="WebCompilerWorkItem" />.
 		/// </summary>
 		/// <param name="workItem">The work item.</param>
 		/// <returns>The job.</returns>
@@ -170,10 +173,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 					WriteError("Cannot infer the compiler type. Skipping this item.");
 					return null;
 				}
-				else
-				{
-					WriteInfo("Infered compiler type: {0}", workItem.Type);
-				}
+				WriteInfo("Infered compiler type: {0}", workItem.Type);
 			}
 
 			return new WebCompilerJob
@@ -184,7 +184,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Pick a compiler from a <see cref="WebCompilerType"/>.
+		///     Pick a compiler from a <see cref="WebCompilerType" />.
 		/// </summary>
 		/// <param name="type">The compiler type.</param>
 		/// <returns>The compiler instance.</returns>
@@ -200,7 +200,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Create all work item from defination.
+		///     Create all work item from defination.
 		/// </summary>
 		/// <param name="definations">The defination.</param>
 		/// <returns>The created work item. If the defination is invalid, this method will return <c>null</c>.</returns>
@@ -210,7 +210,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Get all files for pattern.
+		///     Get all files for pattern.
 		/// </summary>
 		/// <param name="patterns">The pattern list.</param>
 		/// <returns>The file list.</returns>
@@ -226,7 +226,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 
 
 		/// <summary>
-		/// Create a work item from defination.
+		///     Create a work item from defination.
 		/// </summary>
 		/// <param name="defination">The defination.</param>
 		/// <returns>The created work item. If the defination is invalid, this method will return <c>null</c>.</returns>
@@ -251,10 +251,13 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 
 
 		/// <summary>
-		/// Infer the <see cref="WebCompilerType"/> from the input file name.
+		///     Infer the <see cref="WebCompilerType" /> from the input file name.
 		/// </summary>
 		/// <param name="fileName">The input file name.</param>
-		/// <returns>The inferred <see cref="WebCompilerType"/>. If the type cannot be inferred, this method will returns <see cref="WebCompilerType.Auto"/>.</returns>
+		/// <returns>
+		///     The inferred <see cref="WebCompilerType" />. If the type cannot be inferred, this method will returns
+		///     <see cref="WebCompilerType.Auto" />.
+		/// </returns>
 		private static WebCompilerType InferCompileTypeFromFileName(string fileName)
 		{
 			var ext = Path.GetExtension(fileName);
@@ -269,7 +272,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Pick up all work items from a collection of config files.
+		///     Pick up all work items from a collection of config files.
 		/// </summary>
 		/// <param name="configFiles">The collection of paths of all config files.</param>
 		/// <returns>The collection of all work items.</returns>
@@ -287,7 +290,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Try to read compile work items from a config file.
+		///     Try to read compile work items from a config file.
 		/// </summary>
 		/// <param name="configFilePath">The path of the config file.</param>
 		/// <returns>A collection of all work items defined in this file.</returns>
@@ -335,7 +338,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		#region Build
 
 		/// <summary>
-		/// Executing build work for all jobs.
+		///     Executing build work for all jobs.
 		/// </summary>
 		/// <param name="jobs">all jobs.</param>
 		private static void ExecuteBuildAll(IEnumerable<WebCompilerJob> jobs)
@@ -347,7 +350,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Executing build work for a job.
+		///     Executing build work for a job.
 		/// </summary>
 		/// <param name="job">The job.</param>
 		private static void ExecuteBuild(WebCompilerJob job)
@@ -360,7 +363,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		#region Clean
 
 		/// <summary>
-		/// Execute clean all jobs.
+		///     Execute clean all jobs.
 		/// </summary>
 		/// <param name="jobs">All jobs.</param>
 		private static void ExecuteCleanAll(IEnumerable<WebCompilerJob> jobs)
@@ -372,7 +375,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		}
 
 		/// <summary>
-		/// Execute clean job.
+		///     Execute clean job.
 		/// </summary>
 		/// <param name="job">The job.</param>
 		private static void ExecuteClean(WebCompilerJob job)
@@ -389,10 +392,8 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 					WriteError("Cannot delete previous output file '{0}', reason: {1}", file, ex.Message);
 				}
 			}
-
 		}
 
 		#endregion
 	}
 }
-

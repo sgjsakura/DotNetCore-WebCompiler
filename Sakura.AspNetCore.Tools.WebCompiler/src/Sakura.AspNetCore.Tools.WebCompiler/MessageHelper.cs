@@ -6,12 +6,12 @@ using Microsoft.Extensions.Cli.Utils;
 namespace Sakura.AspNetCore.Tools.WebCompiler
 {
 	/// <summary>
-	/// Provide extension methods for write messsages.
+	///     Provide extension methods for write messsages.
 	/// </summary>
 	internal static class MessageHelper
 	{
 		/// <summary>
-		/// Write an error to the console.
+		///     Write an error to the console.
 		/// </summary>
 		/// <param name="format">Format string.</param>
 		/// <param name="args">String args.</param>
@@ -20,7 +20,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 			=> WriteMessageCore(AnsiColorExtensions.Red, "Error", format, args);
 
 		/// <summary>
-		/// Write an info to the console.
+		///     Write an info to the console.
 		/// </summary>
 		/// <param name="format">Format string.</param>
 		/// <param name="args">String args.</param>
@@ -29,7 +29,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 			=> WriteMessageCore(AnsiColorExtensions.Cyan, "Info", format, args);
 
 		/// <summary>
-		/// Write a warning to the console.
+		///     Write a warning to the console.
 		/// </summary>
 		/// <param name="format">Format string.</param>
 		/// <param name="args">String args.</param>
@@ -38,7 +38,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 			=> WriteMessageCore(AnsiColorExtensions.Yellow, "Warning", format, args);
 
 		/// <summary>
-		/// Write a success message to the console.
+		///     Write a success message to the console.
 		/// </summary>
 		/// <param name="format">Format string.</param>
 		/// <param name="args">String args.</param>
@@ -47,7 +47,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 			=> WriteMessageCore(AnsiColorExtensions.Green, null, format, args);
 
 		/// <summary>
-		/// Write a debug message to the console.
+		///     Write a debug message to the console.
 		/// </summary>
 		/// <param name="format">Format string.</param>
 		/// <param name="args">String args.</param>
@@ -55,7 +55,7 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		public static void WriteDebug(string format, params object[] args) => WriteMessageCore(null, "Debug", format, args);
 
 		/// <summary>
-		/// Core method to write console messsages.
+		///     Core method to write console messsages.
 		/// </summary>
 		/// <param name="colorExtension">An extension method to change the text color.</param>
 		/// <param name="caption">The options caption for this message.</param>
