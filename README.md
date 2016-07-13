@@ -56,8 +56,8 @@ Different file type uses different comppilers, and they support different option
 
 Settings|Value Type|Description
 --------|----------|-----------
-generateSourceMap|bool|If true, the SCSS compiler will generate a source map file.
-outputDirectory|string|If set, the output files for each input will be placed in the directory specified. This settings is ignored if you specified the "outputFile" setting
+`generateSourceMap`|bool|If true, the SCSS compiler will generate a source map file. Note that if you specified more than one file as input files, the source map will be unavailable and not generated.
+`outputDirectory`|string|If set, the output files for each input will be placed in the directory specified. This settings is ignored if you specified the "outputFile" setting
 
 ### Binding with Building Events
 In .NET Core applications, you can use project scripts to automatically. A common usage for this tool is compiling files after you build your project, to do so, you may edit `project.json` file and add a new line in `scripts` section like:
