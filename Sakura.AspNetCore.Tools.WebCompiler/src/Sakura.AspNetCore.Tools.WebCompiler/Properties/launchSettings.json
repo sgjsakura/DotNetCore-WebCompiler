@@ -2,8 +2,7 @@
   "profiles": {
     "Sakura.AspNetCore.Tools.WebCompiler": {
       "commandName": "Project",
-      "commandLineArgs": "-c",
-      "workingDirectory": "d:\\Users\\Sakura\\Documents\\Visual Studio 2015\\Projects\\WebCompileTest\\src\\WebCompileTest"
+      "workingDirectory": "d:\\"
     }
   }
 }

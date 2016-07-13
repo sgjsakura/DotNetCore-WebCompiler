@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.DotNet.Cli.Utils;
+using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using Newtonsoft.Json;
+using Sakura.AspNetCore.Tools.WebCompiler.Internal;
+using Sakura.AspNetCore.Tools.WebCompiler.Scss;
 using SharpScss;
 using static Sakura.AspNetCore.Tools.WebCompiler.MessageHelper;
 
@@ -29,226 +35,224 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 		/// <param name="args">Application arguments.</param>
 		public static void Main(string[] args)
 		{
-			var mode = WorkMode.None;
-
-			var targetFiles = new List<string>();
-
-			foreach (var arg in args)
+			var app = new CommandLineApplication
 			{
-				switch (arg.ToLowerInvariant())
+				Name = "dotnet web-compile",
+				FullName = ".NET Core Client Web Assets Compiler",
+				Description =
+					"This tool is used to compile client web assets (e.g. SASS or TypeScript files) using .NET Shared Hosting Service."
+			};
+
+			app.HelpOption("-h|-?|--help");
+
+			var buildOption = app.Option("-b|--build", "Generate all compilation results",
+				CommandOptionType.NoValue);
+
+			var cleanOption = app.Option("-c|--clean", "Clean all previous output files", CommandOptionType.NoValue);
+
+			var configFiles = app.Argument("[configFiles]",
+				string.Format(CultureInfo.CurrentUICulture,
+					"One or more paths to compilation configuration files. If no files is specified, this tool will try to fetch a file named {0} in the currently working directory.",
+					DefaultConfigFileName.Cyan()), true);
+
+			app.OnExecute(() =>
+			{
+				// mode check
+				if (buildOption.HasValue() && cleanOption.HasValue())
 				{
-					case "--help":
-					case "-?":
-					case "-h":
-						// Show help and end execution
-						ShowHelp();
-						return;
-					case "--clean":
-					case "-c":
-						if (mode == WorkMode.None)
-						{
-							mode = WorkMode.Clean;
-						}
-						else
-						{
-							WriteError("Error: more than one work mode is specified.");
-						}
-						break;
-					case "--build":
-					case "-b":
-						if (mode == WorkMode.None)
-						{
-							mode = WorkMode.Build;
-						}
-						else
-						{
-							WriteError("Error: more than one work mode is specified.");
-						}
-						break;
-					default:
-						// options perfix check
-						if (arg.StartsWith("-"))
-						{
-							WriteError("Error: The configure options '{0}' cannot be recognized.", arg);
-							return;
-						}
-						else
-						{
-							targetFiles.Add(arg);
-						}
-						break;
+					WriteError("You cannot specify both \"build\" and \"clean\" options.");
+					app.ShowHelp();
+					return -1;
 				}
-			}
 
-			// If no file is specified, add the default file.
-			if (targetFiles.Count == 0)
-			{
-				WriteInfo("Info: No config file is specified. Using the default file '{0}'.", DefaultConfigFileName);
-				targetFiles.Add(DefaultConfigFileName);
-			}
+				// set mode
+				WorkMode mode;
 
-			var workItems = PickAllWorkItems(targetFiles).ToArray();
-
-			if (workItems.Length > 0)
-			{
-				switch (mode)
+				if (buildOption.HasValue())
 				{
-					case WorkMode.Build:
-					case WorkMode.None:
-						ExecuteBuidAll(workItems);
-						break;
-					case WorkMode.Clean:
-						ExecuteCleanAll(workItems);
-						break;
+					mode = WorkMode.Build;
 				}
-			}
-			else
-			{
-				WriteWarning("Warning: No valid work items need to be processed. Exiting web compiler.");
-			}
+				else if (cleanOption.HasValue())
+				{
+					mode = WorkMode.Clean;
+				}
+				else
+				{
+					// default mode
+					mode = WorkMode.Build;
+				}
+
+				var files = new List<string>(configFiles.Values);
+
+				// If no config files are specified, use the default config file.
+				if (files.Count == 0)
+				{
+					files.Add(DefaultConfigFileName);
+				}
+
+				RunCompileAll(files, mode);
+
+				return 0;
+			});
+
+			app.Execute(args);
 		}
 
-		#region WorkItem Pick
+		#region Core Method
 
 		/// <summary>
-		/// Pick up all work items from a collection of config files.
+		/// Create all jobs from config files.
 		/// </summary>
-		/// <param name="configFiles">The collection of paths of all config files.</param>
-		/// <returns>The collection of all work items.</returns>
-		private static IEnumerable<WebCompileWorkItem> PickAllWorkItems(IEnumerable<string> configFiles)
+		/// <param name="configFiles">Config files.</param>
+		private static IEnumerable<WebCompilerJob> CreateJobsFromFiles(IEnumerable<string> configFiles)
 		{
-			var result = new List<WebCompileWorkItem>();
-
-			foreach (var configFile in configFiles)
-			{
-				result.AddRange(ReadConfig(configFile));
-			}
-
-			return result;
+			var definitions = PickAllWorkItemDefinations(configFiles);
+			var workItems = CreateWorkItems(definitions);
+			return CreateAllJobs(workItems);
 		}
 
 		/// <summary>
-		/// Try to read compile work items from a config file.
+		/// Run all jobs.
 		/// </summary>
-		/// <param name="configFilePath">The path of the config file.</param>
-		/// <returns>A collection of all work items defined in this file.</returns>
-		private static IEnumerable<WebCompileWorkItem> ReadConfig(string configFilePath)
+		/// <param name="configFiles">Job source config files.</param>
+		/// <param name="mode">Tool's work mode.</param>
+		private static void RunCompileAll(IEnumerable<string> configFiles, WorkMode mode)
 		{
-			try
-			{
-				var text = File.ReadAllText(configFilePath);
-				var result = JsonConvert.DeserializeObject<WebCompileWorkItem[]>(text);
+			var jobs = CreateJobsFromFiles(configFiles).ToArray();
 
-				// Append debug information
-				for (var i = 0; i < result.Length; i++)
-				{
-					result[i].ConfigFileName = configFilePath;
-					result[i].ConfigIndexInFile = i;
-				}
-
-				return result;
-			}
-			catch (IOException ex)
+			if (jobs.Length == 0)
 			{
-				WriteError($"Error occured while accessing the file '{configFilePath}', detailed information: {ex.Message}");
+				WriteWarning("No actual job is created. No futher work will be done.");
+				return;
 			}
 
-			return Enumerable.Empty<WebCompileWorkItem>();
+			switch (mode)
+			{
+				case WorkMode.Build:
+					ExecuteBuildAll(jobs);
+					break;
+				case WorkMode.Clean:
+					ExecuteCleanAll(jobs);
+					break;
+			}
 		}
 
-		#endregion
-
-		#region Build
-
 		/// <summary>
-		/// Executing build work for all work items.
+		/// Create all jobs for work items.
 		/// </summary>
-		/// <param name="workItems">all work items.</param>
-		private static void ExecuteBuidAll(IEnumerable<WebCompileWorkItem> workItems)
+		/// <param name="workItems">A collection of all work items.</param>
+		/// <returns>All job generated from <paramref name="workItems"/>.</returns>
+		private static IEnumerable<WebCompilerJob> CreateAllJobs(IEnumerable<WebCompilerWorkItem> workItems)
 		{
 			foreach (var item in workItems)
 			{
-				BuildItem(item);
+				var job = CreateJob(item);
+
+				if (job != null)
+				{
+					yield return job;
+				}
 			}
 		}
 
 		/// <summary>
-		/// Executing build work for a work item.
+		/// Create a job from a <see cref="WebCompilerWorkItem"/>.
 		/// </summary>
 		/// <param name="workItem">The work item.</param>
-		private static void BuildItem(WebCompileWorkItem workItem)
+		/// <returns>The job.</returns>
+		private static WebCompilerJob CreateJob(WebCompilerWorkItem workItem)
 		{
-			Console.WriteLine("Executing Build for work item {0} of file '{1}'.", workItem.ConfigIndexInFile, workItem.ConfigFileName);
-
-			if (workItem.InputFiles == null || workItem.InputFiles.Length == 0)
-			{
-				WriteError("Error: No input file pattern item is provided.");
-				return;
-			}
-
-			if (string.IsNullOrEmpty(workItem.OutputFileName))
-			{
-				WriteError("Error: No output file provided.");
-			}
-
-			var matcher = new Matcher();
-			matcher.AddIncludePatterns(workItem.InputFiles);
-
-			var files = matcher.GetResultsInFullPath(Directory.GetCurrentDirectory()).ToArray();
-
-			// No files matched
-			if (files.Length == 0)
-			{
-				WriteWarning("Warning: No actual input file is matched in the work item {0} of file '{1}'. Skipping this work item.", workItem.ConfigIndexInFile, workItem.ConfigFileName);
-				return;
-			}
-
-			// Infer type if necessary 
+			// Infer type
 			if (workItem.Type == WebCompilerType.Auto)
 			{
-				WriteInfo("Info: Trying to infer the compiler type using file name {0}", files.First());
+				WriteInfo("No compiler type is defined. Trying to infer the compiler type.");
 				workItem.Type = InferCompileTypeFromFileName(workItem.InputFiles.First());
 
-				// Check result
+				// Cannot infer type
 				if (workItem.Type == WebCompilerType.Auto)
 				{
-					WriteError("Error: Cannot infer compiler type. Skipping this work item.");
-					return;
+					WriteError("Cannot infer the compiler type. Skipping this item.");
+					return null;
 				}
-
-				WriteInfo("Info: Inferred compiler type is {0}", workItem.Type);
+				else
+				{
+					WriteInfo("Infered compiler type: {0}", workItem.Type);
+				}
 			}
 
-			var compiler = GenerateCompiler(workItem);
-
-			// No compiler
-			if (compiler == null)
+			return new WebCompilerJob
 			{
-				WriteError("Error: Unsupported compiler type {0}, is there any wrong in config file?", workItem.Type);
-				return;
-			}
-
-			// Executing compilation
-			compiler.Compile(files, workItem.OutputFileName, workItem.Options);
+				WorkItem = workItem,
+				Compiler = PickCompilerForType(workItem.Type)
+			};
 		}
 
 		/// <summary>
-		/// Generate compiler for a work item.
+		/// Pick a compiler from a <see cref="WebCompilerType"/>.
 		/// </summary>
-		/// <param name="workItem">The work item.</param>
-		/// <returns>A compiler for this work item.</returns>
-		private static IWebCompiler GenerateCompiler(WebCompileWorkItem workItem)
+		/// <param name="type">The compiler type.</param>
+		/// <returns>The compiler instance.</returns>
+		private static IWebCompiler PickCompilerForType(WebCompilerType type)
 		{
-			IWebCompiler compiler = null;
-
-			switch (workItem.Type)
+			switch (type)
 			{
 				case WebCompilerType.Scss:
-					compiler = new ScssCompiler();
-					break;
+					return new ScssCompiler();
+				default:
+					throw new ArgumentException("No compiler is associated with type.", nameof(type));
 			}
-			return compiler;
 		}
+
+		/// <summary>
+		/// Create all work item from defination.
+		/// </summary>
+		/// <param name="definations">The defination.</param>
+		/// <returns>The created work item. If the defination is invalid, this method will return <c>null</c>.</returns>
+		private static IEnumerable<WebCompilerWorkItem> CreateWorkItems(IEnumerable<WebCompilerWorkItemDefination> definations)
+		{
+			return definations.Select(CreateWorkItemFromDefinition).Where(i => i != null);
+		}
+
+		/// <summary>
+		/// Get all files for pattern.
+		/// </summary>
+		/// <param name="patterns">The pattern list.</param>
+		/// <returns>The file list.</returns>
+		private static IEnumerable<string> GetFilesForPatterns(IEnumerable<string> patterns)
+		{
+			var matcher = new Matcher();
+			matcher.AddIncludePatterns(patterns);
+
+			return
+				matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(Directory.GetCurrentDirectory())))
+					.Files.Select(i => i.Path);
+		}
+
+
+		/// <summary>
+		/// Create a work item from defination.
+		/// </summary>
+		/// <param name="defination">The defination.</param>
+		/// <returns>The created work item. If the defination is invalid, this method will return <c>null</c>.</returns>
+		private static WebCompilerWorkItem CreateWorkItemFromDefinition(WebCompilerWorkItemDefination defination)
+		{
+			var files = GetFilesForPatterns(defination.InputFiles).ToArray();
+
+			if (files.Length == 0)
+			{
+				WriteWarning("No actual input files are matched. Skipping this work item.");
+				return null;
+			}
+
+			return new WebCompilerWorkItem
+			{
+				InputFiles = new ReadOnlyCollection<string>(files),
+				OutputFile = defination.MergedOutputFile,
+				Type = defination.Type,
+				Options = new WebCompilerWorkItemOptions(new Dictionary<string, object>(defination.Options))
+			};
+		}
+
 
 		/// <summary>
 		/// Infer the <see cref="WebCompilerType"/> from the input file name.
@@ -268,90 +272,127 @@ namespace Sakura.AspNetCore.Tools.WebCompiler
 			return WebCompilerType.Auto;
 		}
 
+		/// <summary>
+		/// Pick up all work items from a collection of config files.
+		/// </summary>
+		/// <param name="configFiles">The collection of paths of all config files.</param>
+		/// <returns>The collection of all work items.</returns>
+		private static IEnumerable<WebCompilerWorkItemDefination> PickAllWorkItemDefinations(IEnumerable<string> configFiles)
+		{
+			var result = new List<WebCompilerWorkItemDefination>();
+
+			foreach (var configFile in configFiles)
+			{
+				result.AddRange(ReadConfig(configFile));
+			}
+
+			WriteDebug("Totally {0} job(s) found in all config files.", result.Count);
+			return result;
+		}
+
+		/// <summary>
+		/// Try to read compile work items from a config file.
+		/// </summary>
+		/// <param name="configFilePath">The path of the config file.</param>
+		/// <returns>A collection of all work items defined in this file.</returns>
+		private static IEnumerable<WebCompilerWorkItemDefination> ReadConfig(string configFilePath)
+		{
+			WriteDebug("Parsing file {0}", configFilePath);
+
+			try
+			{
+				var text = File.ReadAllText(configFilePath);
+				var result = JsonConvert.DeserializeObject<WebCompilerWorkItemDefination[]>(text);
+
+				// Append debug information
+				for (var i = 0; i < result.Length; i++)
+				{
+					result[i].ConfigFileName = configFilePath;
+					result[i].ConfigIndexInFile = i;
+				}
+
+				if (result.Length == 0)
+				{
+					WriteWarning("No job definiations found in file '{0}'.", configFilePath);
+				}
+				else
+				{
+					WriteDebug("{0} job(s) found in file.", result.Length);
+				}
+
+				return result;
+			}
+			catch (IOException ex)
+			{
+				WriteError($"Cannot read the configuration file '{configFilePath}', detailed information: {ex.Message}");
+			}
+
+			return Enumerable.Empty<WebCompilerWorkItemDefination>();
+		}
+
+		#endregion
+
+		#region Build
+
+		/// <summary>
+		/// Executing build work for all jobs.
+		/// </summary>
+		/// <param name="jobs">all jobs.</param>
+		private static void ExecuteBuildAll(IEnumerable<WebCompilerJob> jobs)
+		{
+			foreach (var item in jobs)
+			{
+				ExecuteBuild(item);
+			}
+		}
+
+		/// <summary>
+		/// Executing build work for a job.
+		/// </summary>
+		/// <param name="job">The job.</param>
+		private static void ExecuteBuild(WebCompilerJob job)
+		{
+			job.Compiler.Compile(job.WorkItem);
+		}
+
 		#endregion
 
 		#region Clean
 
 		/// <summary>
-		/// Execute clean job for all work items.
+		/// Execute clean all jobs.
 		/// </summary>
-		/// <param name="workItems">All work items.</param>
-		private static void ExecuteCleanAll(IEnumerable<WebCompileWorkItem> workItems)
+		/// <param name="jobs">All jobs.</param>
+		private static void ExecuteCleanAll(IEnumerable<WebCompilerJob> jobs)
 		{
-			foreach (var item in workItems)
+			foreach (var item in jobs)
 			{
 				ExecuteClean(item);
 			}
 		}
 
 		/// <summary>
-		/// Execute clean job for a single work item.
+		/// Execute clean job.
 		/// </summary>
-		/// <param name="workItem">The work item.</param>
-		private static void ExecuteClean(WebCompileWorkItem workItem)
+		/// <param name="job">The job.</param>
+		private static void ExecuteClean(WebCompilerJob job)
 		{
-			Console.WriteLine("Executing Clean for work item {0} of file '{1}'.", workItem.ConfigIndexInFile, workItem.ConfigFileName);
-
-			if (string.IsNullOrEmpty(workItem.OutputFileName))
+			foreach (var file in job.Compiler.GetDefaultOutputFile(job.WorkItem))
 			{
-				WriteError("Error: No output file provided.");
-				return;
+				try
+				{
+					File.Delete(file);
+					WriteSuccess("  -> Clean {0}", file);
+				}
+				catch (IOException ex)
+				{
+					WriteError("Cannot delete previous output file '{0}', reason: {1}", file, ex.Message);
+				}
 			}
 
-
-			try
-			{
-				File.Delete(workItem.OutputFileName);
-				WriteSuccess("  -> Clean {0}", workItem.OutputFileName);
-			}
-			catch (IOException ex)
-			{
-				WriteError("Error: Cannot delete previous output file '{0}', reason: {1}", workItem.OutputFileName, ex.Message);
-			}
-		}
-
-		private static void HandleAllFile(IEnumerable<string> configFilePaths)
-		{
-			var items = new List<WebCompileWorkItem>();
-
-			// Read all files
-			foreach (var filePath in configFilePaths)
-			{
-				items.AddRange(ReadConfig(filePath));
-			}
-
-			foreach (var item in items)
-			{
-				BuildItem(item);
-			}
-		}
-
-		#endregion
-
-		#region Show Help
-
-		/// <summary>
-		/// Show Help for this tool.
-		/// </summary>
-		private static void ShowHelp()
-		{
-			Console.WriteLine(".NET Core Web Compiler Tools by Iris Sakura");
-			Console.WriteLine("For more information, please visit https://github.com/sgjsakura/DotNetCore-WebCompiler");
-			Console.WriteLine();
-			Console.WriteLine("Usage: dotnet webcompile [args] [configPaths]");
-			Console.WriteLine("    args: Specify the work mode for the wb compiler.");
-			Console.WriteLine("    configPaths: Pathes for each web compile configuration files.");
-			Console.WriteLine("    If no config file is provided, this tool will try to read file '{0}' in current directory.", DefaultConfigFileName);
-			Console.WriteLine();
-
-			Console.WriteLine("The args can be one of the following (case insenstive):");
-			Console.WriteLine("    -?|-h|help|--help: show this help information. Ignore all other arguments.");
-			Console.WriteLine("    -c|--clean: Clean all output files defined in configuration files.");
-			Console.WriteLine("    -b|--build: Compile all files according to in configuration files.");
-
-			Console.WriteLine("    If no args are specified, this tool will use '-b' as default argument.");
 		}
 
 		#endregion
 	}
 }
+

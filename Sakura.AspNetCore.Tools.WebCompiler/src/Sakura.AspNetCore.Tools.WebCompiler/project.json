@@ -1,8 +1,8 @@
 ﻿{
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"buildOptions": {
-			"emitEntryPoint": true,
-			"outputName": "dotnet-webcompile"
+		"emitEntryPoint": true,
+		"outputName": "dotnet-web-compile"
 	},
 
 	"authors": [ "Iris Sakura" ],
@@ -12,29 +12,36 @@
 	"packOptions": {
 		"owners": [ "Iris Sakura" ],
 		"summary": "This tools is used to compile client web files in your .NET Core application.",
-		"releaseNotes": "First release with basic SCSS support.",
+		"releaseNotes": "Update code strucutre.",
 		"repository": {
 
 			"type": "git",
-			"url": "https://github.com/sgjsakura/DotNetCore-WebCompiler"
+			"url": "git://github.com/sgjsakura/DotNetCore-WebCompiler"
 		},
 		"licenseUrl": "https://github.com/sgjsakura/AspNetCore/blob/master/LICENSE.txt",
-		"tags": [ ".NETCore", "ASP.NET", "ASP.NETCore", "Compile", "Compiler", "WebCompile", "WebCompiler", "SCSS", "SASS", "CSS" ]
+		"tags": [ ".NETCore", "ASP.NET", "ASP.NETCore", "Compile", "Compiler", "WebCompile", "WebCompiler", "SCSS", "SASS", "CSS" ],
+		"files": "*.runtimeconfig.json"
 	},
 
 	"dependencies": {
-		"Microsoft.NETCore.App": {
-			"type": "platform",
-			"version": "1.0.0"
-		},
 
 		"Newtonsoft.Json": "9.0.1",
 		"SharpScss": "1.2.0",
+		"Microsoft.DotNet.Cli.Utils": "1.0.0-preview2-003121",
+		"Microsoft.Extensions.CommandLineUtils": "1.0.0",
 		"Microsoft.Extensions.FileSystemGlobbing": "1.0.0"
 	},
 
 	"frameworks": {
-		"netcoreapp1.0": {}
+		"netcoreapp1.0": {
+			"dependencies": {
+				"Microsoft.NETCore.App": {
+					"type": "platform",
+					"version": "1.0.0"
+				}
+			}
+		},
+		"net451": {}
 	},
 	"configurations": {
 		"Debug": {
@@ -51,6 +58,6 @@
 		}
 	},
 	"scripts": {
-		"postcompile": ["dotnet pack --no-build -c Release"]
+		"postcompile": [ "dotnet pack --no-build -c Release" ]
 	}
 }
